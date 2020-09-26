@@ -24,10 +24,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.android.codelabs.paging.R
-import com.example.android.codelabs.paging.model.Repo
+import com.example.android.codelabs.paging.data.source.network.model.response.GithubRepoResponse
+import com.example.android.codelabs.paging.domain.entities.GithubRepo
 
 /**
- * View Holder for a [Repo] RecyclerView list item.
+ * View Holder for a [GithubRepoResponse] RecyclerView list item.
  */
 class RepoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val name: TextView = view.findViewById(R.id.repo_name)
@@ -36,7 +37,7 @@ class RepoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val language: TextView = view.findViewById(R.id.repo_language)
     private val forks: TextView = view.findViewById(R.id.repo_forks)
 
-    private var repo: Repo? = null
+    private var repo: GithubRepo? = null
 
     init {
         view.setOnClickListener {
@@ -47,7 +48,7 @@ class RepoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 
-    fun bind(repo: Repo?) {
+    fun bind(repo: GithubRepo?) {
         if (repo == null) {
             val resources = itemView.resources
             name.text = resources.getString(R.string.loading)
@@ -60,7 +61,7 @@ class RepoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 
-    private fun showRepoData(repo: Repo) {
+    private fun showRepoData(repo: GithubRepo) {
         this.repo = repo
         name.text = repo.fullName
 
