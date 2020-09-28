@@ -1,6 +1,7 @@
 package com.example.android.codelabs.paging.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
@@ -52,6 +53,11 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         search(query)
         initSearch(query)
         binding.retryButton.setOnClickListener { adapter.retry() }
+        viewModel.getPageInfo().observe(this, {
+            it?.let {
+                Log.d("SearchRepositories", "total: ${it.totalCount}")
+            }
+        })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

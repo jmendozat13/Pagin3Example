@@ -1,6 +1,7 @@
 package com.example.android.codelabs.paging
 
 import android.app.Application
+import com.example.android.codelabs.paging.data.di.dataBaseModule
 import com.example.android.codelabs.paging.data.di.dataSourceModule
 import com.example.android.codelabs.paging.data.di.repositoryModule
 import com.example.android.codelabs.paging.data.di.retrofitModule
@@ -20,6 +21,7 @@ class BaseApplication : Application() {
             modules(
                     listOf(
                             retrofitModule,
+                            dataBaseModule,
                             dataSourceModule,
                             repositoryModule,
                             useCaseModule,
