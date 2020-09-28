@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.android.codelabs.paging.databinding.ActivitySearchRepositoriesBinding
 import kotlinx.coroutines.Job
@@ -24,6 +25,9 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchRepositoriesBinding
     private val viewModel: SearchRepositoriesViewModel by inject()
     private val adapter = ReposAdapter()
+    private val pagingHeaderAdapter: PagingHeaderAdapter by lazy {
+        PagingHeaderAdapter()
+    }
 
     private var searchJob: Job? = null
 
@@ -55,7 +59,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         binding.retryButton.setOnClickListener { adapter.retry() }
         viewModel.getPageHeaderInfo().observe(this, {
             it?.let {
-                Log.d("SearchRepositories", "total: ${it.totalCount}")
+                pagingHeaderAdapter.changeArrowCount(it.totalCount)
             }
         })
     }
@@ -66,10 +70,14 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     }
 
     private fun initAdapter() {
-        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
-                header = ReposLoadStateAdapter { adapter.retry() },
+
+        val pagingData = adapter.withLoadStateFooter(
                 footer = ReposLoadStateAdapter { adapter.retry() }
         )
+        val concat = ConcatAdapter(pagingHeaderAdapter)
+        concat.addAdapter(pagingData)
+        binding.list.adapter = concat
+
         adapter.addLoadStateListener { loadState ->
             // Only show the list if refresh succeeds.
             binding.list.isVisible = loadState.source.refresh is LoadState.NotLoading
