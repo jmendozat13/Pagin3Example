@@ -1,33 +1,49 @@
-/*
- * Copyright (C) 2020 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.android.codelabs.paging.ui
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.paging.LoadState
 import androidx.paging.LoadStateAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.example.android.codelabs.paging.databinding.ReposLoadStateFooterViewItemBinding
+import com.example.android.codelabs.paging.ui.ReposLoadStateAdapter.ViewHolder
+
 
 class ReposLoadStateAdapter(
         private val retry: () -> Unit
-) : LoadStateAdapter<ReposLoadStateViewHolder>() {
-    override fun onBindViewHolder(holder: ReposLoadStateViewHolder, loadState: LoadState) {
-        holder.bind(loadState)
-    }
+) : LoadStateAdapter<ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, loadState: LoadState): ReposLoadStateViewHolder {
-        return ReposLoadStateViewHolder.create(parent, retry)
+
+    override fun onBindViewHolder(holder: ViewHolder, loadState: LoadState) = holder.bind(loadState)
+
+    override fun onCreateViewHolder(parent: ViewGroup, loadState: LoadState): ViewHolder = ViewHolder.from(parent, retry)
+
+    class ViewHolder(private val binding: ReposLoadStateFooterViewItemBinding,
+                     retry: () -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            binding.retryButton.also {
+                it.setOnClickListener { retry.invoke() }
+            }
+        }
+
+        fun bind(loadState: LoadState) {
+            if (loadState is LoadState.Error) {
+                binding.errorMsg.text = loadState.error.localizedMessage
+            }
+            binding.progressBar.isVisible = loadState is LoadState.Loading
+            binding.retryButton.isVisible = loadState !is LoadState.Loading
+            binding.errorMsg.isVisible = loadState !is LoadState.Loading
+        }
+
+        companion object {
+            fun from(parent: ViewGroup, retry: () -> Unit): ViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ReposLoadStateFooterViewItemBinding.inflate(layoutInflater, parent, false)
+                return ViewHolder(binding, retry)
+            }
+        }
     }
 }
