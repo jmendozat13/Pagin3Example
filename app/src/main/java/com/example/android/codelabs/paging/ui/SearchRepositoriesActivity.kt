@@ -53,7 +53,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         search(query)
         initSearch(query)
         binding.retryButton.setOnClickListener { adapter.retry() }
-        viewModel.getPageInfo().observe(this, {
+        viewModel.getPageHeaderInfo().observe(this, {
             it?.let {
                 Log.d("SearchRepositories", "total: ${it.totalCount}")
             }

@@ -6,6 +6,7 @@ import com.example.android.codelabs.paging.data.source.database.model.PagingInfo
 import com.example.android.codelabs.paging.data.source.network.api.GithubService
 import com.example.android.codelabs.paging.data.source.network.api.IN_QUALIFIER
 import com.example.android.codelabs.paging.data.source.network.model.response.GithubRepoResponse
+import com.example.android.codelabs.paging.domain.entities.FilterGithub
 import com.example.android.codelabs.paging.domain.entities.GithubRepo
 import retrofit2.HttpException
 import java.io.IOException
@@ -15,15 +16,15 @@ private const val GITHUB_STARTING_PAGE_INDEX = 1
 class GithubPagingSource(
         private val service: GithubService,
         private val pagingInfoDataSource: IPagingInfoDataSource,
-        private val query: String
+        private val filter: FilterGithub
 ) : PagingSource<Int, GithubRepo>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GithubRepo> {
         val position = params.key ?: GITHUB_STARTING_PAGE_INDEX
-        val apiQuery = query + IN_QUALIFIER
+        val apiQuery = filter.query + IN_QUALIFIER
         return try {
             val response = service.searchRepos(apiQuery, position, params.loadSize)
             val repos = GithubRepoResponse.mapToDomainEntityList(response.items)
-            pagingInfoDataSource.insertPagingInfo(PagingInfoModel("GITHUB", response.total.toLong()))
+            pagingInfoDataSource.insertPagingInfo(PagingInfoModel(filter.source, response.total.toLong()))
             LoadResult.Page(
                     data = repos,
                     prevKey = if (position == GITHUB_STARTING_PAGE_INDEX) null else position - 1,
