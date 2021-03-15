@@ -1,6 +1,7 @@
 package com.example.android.codelabs.paging.data.source.network.paging
 
 import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.example.android.codelabs.paging.data.source.IPagingInfoDataSource
 import com.example.android.codelabs.paging.data.source.database.model.PagingInfoModel
 import com.example.android.codelabs.paging.data.source.network.api.GithubService
@@ -35,5 +36,9 @@ class GithubPagingSource(
         } catch (exception: HttpException) {
             LoadResult.Error(exception)
         }
+    }
+
+    override fun getRefreshKey(state: PagingState<Int, GithubRepo>): Int? {
+        return state.anchorPosition
     }
 }
